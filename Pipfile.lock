@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "22aa09b4378f5d5ce4990643caf3a0b993585275b38574712d41000b9e1097d4"
+            "sha256": "8c1eb01173535f51abc358d2c1bc4db226b723379642ee0170185c4a23b3e79e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -85,6 +85,26 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==0.11.0"
+        },
+        "dlib-bin": {
+            "hashes": [
+                "sha256:0a4a24ca33ee305d888432cc5479710b8e8a8264d7af16e9733ba4875a7be02f",
+                "sha256:108d6f7cfc7658316a1a8346191061a6d3f1eff331bb4bc38a7faf6cbdabef30",
+                "sha256:1123db3f89f29255c7477a47814c770dc1820950d2323006426668c54a68b9d4",
+                "sha256:16825e3dd06a89e9dfe29e0957de73b0757f870ce92121d5322b6e264c9051de",
+                "sha256:4ce18010d6951ffea4405a41e3a1f916b64edeb68541bac7def3c34b69b1c58f",
+                "sha256:4f4555e199046f20a4a7238e04c89dafe98a1b46717f388492caeb99a53a1f42",
+                "sha256:61ef5f4086e7e77dc672df8245b6175b40c047596f4e7a60d5da932ac5e80be5",
+                "sha256:6cda479f5d27ab7985285a68c5d0a3e5e884ce087f0d02115ffe59dce25f3091",
+                "sha256:c7785c474bfd51f266a19a7c8f5710e4e6ae22b43f5230e796b301d1637cee33",
+                "sha256:d0788c8d7f942eeb12b8c905bab5da3b1da818ca0bfa67a198e2d618772700b8",
+                "sha256:d637ca96a591943ef401af37545dbc86c4505be22c56d9b31b81d2c55eb6d733",
+                "sha256:e121b61bedba75c7de31fb4de7f20e56379e7c135295f7ef3aee0a31f3b5f05f",
+                "sha256:e1e331b6d9c50d5bc428d329532b8c4fddb4fe0bc1f3d216d8e51635e559e2a7",
+                "sha256:ed54464edb329b7b1291f049d34edcb16301f3edf0a7ecfbf5a456f34dd49450"
+            ],
+            "index": "pypi",
+            "version": "==19.21.0"
         },
         "flask": {
             "hashes": [
@@ -186,6 +206,13 @@
             ],
             "index": "pypi",
             "version": "==0.4.5"
+        },
+        "imutils": {
+            "hashes": [
+                "sha256:03827a9fca8b5c540305c0844a62591cf35a0caec199cb0f2f0a4a0fb15d8f24"
+            ],
+            "index": "pypi",
+            "version": "==0.5.4"
         },
         "iniconfig": {
             "hashes": [
@@ -611,7 +638,7 @@
                 "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1",
                 "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"
             ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.4.7"
         },
         "pytest": {
@@ -627,7 +654,7 @@
                 "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86",
                 "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.8.2"
         },
         "pywavelets": {
@@ -815,7 +842,7 @@
                 "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
                 "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
         },
         "tensorboard": {
@@ -861,7 +888,7 @@
                 "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b",
                 "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
             ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==0.10.2"
         },
         "torch": {

@@ -17,6 +17,9 @@ imageio-ffmpeg = "*"
 flask = "*"
 tensorboard = "*"
 pytest = "*"
+dlib-bin = "*"
+imutils = "*"
+eos = "*"
 
 [requires]
 python_version = "3.8"
