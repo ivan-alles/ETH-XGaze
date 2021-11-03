@@ -173,3 +173,4 @@ if __name__ == '__main__':
     output_path = 'example/output/results_gaze.jpg'
     print('save output image to: ', output_path)
     cv2.imwrite(output_path, face_patch_gaze)
+    cv2.imwrite('example/output/img_normalized.jpg', img_normalized)
