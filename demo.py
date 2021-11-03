@@ -1,4 +1,5 @@
 import os
+import sys
 import cv2
 import dlib
 from imutils import face_utils
@@ -94,8 +95,7 @@ def normalizeData_face(img, face_model, landmarks, hr, ht, cam):
 
     return img_warped, landmarks_warped
 
-if __name__ == '__main__':
-    img_file_name = './example/input/cam00.JPG'
+def predict(img_file_name):
     print('load input face image: ', img_file_name)
     image = cv2.imread(img_file_name)
 
@@ -174,3 +174,8 @@ if __name__ == '__main__':
     print('save output image to: ', output_path)
     cv2.imwrite(output_path, face_patch_gaze)
     cv2.imwrite('example/output/img_normalized.jpg', img_normalized)
+
+
+if __name__ == '__main__':
+    image_file_name = './example/input/cam00.JPG' if len(sys.argv) < 2 else sys.argv[1]
+    predict(image_file_name)
