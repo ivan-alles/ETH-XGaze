@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+torch = {file = "https://download.pytorch.org/whl/cu102/torch-1.10.0%2Bcu102-cp38-cp38-win_amd64.whl", sys_platform = "== 'win32'"}
+pillow = "*"
+tqdm = "*"
+numpy = "*"
+pyyaml = "*"
+opencv-python = "*"
+imageio = "*"
+scikit-image = "*"
+scikit-learn = "*"
+imageio-ffmpeg = "*"
+flask = "*"
+tensorboard = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.8"
