@@ -7,3 +7,4 @@
 .idea/workspace.xml
 *.pth.tar
 example/output
+output

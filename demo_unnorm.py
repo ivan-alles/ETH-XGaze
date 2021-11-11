@@ -1,13 +1,11 @@
 import os
-import sys
+import glob
+import argparse
 import cv2
-import dlib
 import numpy as np
 import torch
 from torchvision import transforms
 from model import gaze_network
-
-
 
 trans = transforms.Compose([
         transforms.ToPILImage(),
@@ -34,11 +32,9 @@ def draw_gaze(image_in, pitchyaw, thickness=2, color=(0, 0, 255)):
     return image_out
 
 
-def predict(img_file_name):
+def predict(image_files, output_path):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    print('load input face image: ', img_file_name)
-    image = cv2.imread(img_file_name)
 
     print('load gaze estimator')
     model = gaze_network()
@@ -52,22 +48,35 @@ def predict(img_file_name):
     model.load_state_dict(ckpt['model_state'], strict=True)  # load the pre-trained model
     model.eval()  # change it to the evaluation mode
     model.to(device)
-    input_var = image[:, :, ::-1]  # from BGR to RGB
-    input_var = trans(input_var).unsqueeze(0).to(device)
-    #input_var = torch.autograd.Variable(input_var.float().cuda())
-    #input_var = input_var.view(1, input_var.size(0), input_var.size(1), input_var.size(2))  # the input must be 4-dimension
-    pred_gaze = model(input_var)  # get the output gaze direction, this is 2D output as pitch and raw rotation
-    pred_gaze = pred_gaze[0] # here we assume there is only one face inside the image, then the first one is the prediction
-    pred_gaze_np = pred_gaze.cpu().data.numpy()  # convert the pytorch tensor to numpy array
 
-    print('prepare the output')
-    # draw the facial landmarks
-    face_patch_gaze = draw_gaze(image, pred_gaze_np)  # draw gaze direction on the normalized face image
-    output_path = 'example/output/results_gaze.jpg'
-    print('save output image to: ', output_path)
-    cv2.imwrite(output_path, face_patch_gaze)
+    for i, img_file_name in enumerate(image_files):
+        image = cv2.imread(img_file_name)
+        input_var = image[:, :, ::-1]  # from BGR to RGB
+        input_var = trans(input_var).unsqueeze(0).to(device)
+        #input_var = torch.autograd.Variable(input_var.float().cuda())
+        #input_var = input_var.view(1, input_var.size(0), input_var.size(1), input_var.size(2))  # the input must be 4-dimension
+        pred_gaze = model(input_var)  # get the output gaze direction, this is 2D output as pitch and raw rotation
+        pred_gaze = pred_gaze[0] # here we assume there is only one face inside the image, then the first one is the prediction
+        pred_gaze_np = pred_gaze.cpu().data.numpy()  # convert the pytorch tensor to numpy array
+
+        # draw the facial landmarks
+        face_patch_gaze = draw_gaze(image, pred_gaze_np)  # draw gaze direction on the normalized face image
+        cv2.imwrite(os.path.join(output_path, f'{i:05d}.png'), face_patch_gaze)
 
 
 if __name__ == '__main__':
-    image_file_name = './example/input/cam00.JPG' if len(sys.argv) < 2 else sys.argv[1]
-    predict(image_file_name)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_path", default=None, help="path to image or directory with images")
+    parser.add_argument("--glob_pattern", default='/**/*.png', help="pattern to search for images")
+    parser.add_argument("--output_path", default='output', help="output directory")
+
+    args = parser.parse_args()
+    if os.path.isfile(args.input_path):
+        image_files = [args.input_path]
+    else:
+        glob_pattern = args.input_path + args.glob_pattern
+        image_files = glob.glob(glob_pattern, recursive=True)
+
+    os.makedirs(args.output_path, exist_ok=True)
+
+    predict(image_files, args.output_path)
