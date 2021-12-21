@@ -154,6 +154,7 @@ def normalizeData(img, face_model, hr, ht, gc, cam):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Data Normalization")
+    parser.add_argument("--root_dir", help="Root data directory")
     parser.add_argument("-sb", "--subject_begin", type=int, help="which subject to process begining")
     parser.add_argument("-se", "--subject_end", type=int, help="which subject to process at the end")
     args = parser.parse_args()
@@ -191,16 +192,16 @@ if __name__ == '__main__':
 
     print('Load the camera parameters')
     for cam_id in range(0, 18):
-        file_name = './calibration/cam_calibration/' + 'cam' + str(cam_id).zfill(2) + '.xml'
+        file_name = os.path.join(args.root_dir, 'calibration', 'cam_calibration', 'cam' + str(cam_id).zfill(2) + '.xml')
         fs = cv2.FileStorage(file_name, cv2.FILE_STORAGE_READ)
         camera_matrix.append(fs.getNode('Camera_Matrix').mat())
-        camera_distortion.append(fs.getNode('Distortion_Coefficients').mat()) # here we disable distortion
+        camera_distortion.append(fs.getNode('Distortion_Coefficients').mat())  # here we disable distortion
         cam_translation.append(fs.getNode('cam_translation').mat())
         cam_rotation.append(fs.getNode('cam_rotation').mat())
         fs.release()
 
     # load face model
-    face_model_load = np.loadtxt('./calibration/face_model.txt')
+    face_model_load = np.loadtxt(os.path.join(args.root_dir, 'calibration', 'face_model.txt'))
     landmark_use = [20, 23, 26, 29, 15, 19]
     face_model = face_model_load[landmark_use, :]
 
@@ -208,25 +209,17 @@ if __name__ == '__main__':
         start_time = time.time()
         start_time_batch = time.time()
 
-        subject_folder = './data/train/subject' + str(sub_id).zfill(4)
+        subject_folder = os.path.join(args.root_dir, 'data', 'train', 'subject' + str(sub_id).zfill(4))
         if not os.path.isdir(subject_folder):  # we keep going
             print('The folder ', subject_folder, ' does not exist')
             continue
         print('Processing ', subject_folder)
 
         # output file
-        hdf_fpath = os.path.join(output_dir, 'subject' + str(sub_id).zfill(4) + '.h5')
-        if is_over_write:
-            if os.path.exists(hdf_fpath):
-                print('Overwrite the file ', subject_folder)
-                os.remove(hdf_fpath)
-        else:
-            if os.path.exists(hdf_fpath):
-                print('Skip the file ', subject_folder, ' since it is already exist')
-                continue
+        subject_output_dir = os.path.join(output_dir, 'subject' + str(sub_id).zfill(4))
+        os.makedirs(subject_output_dir, exist_ok=True)
 
-        output_h5_id = h5py.File(hdf_fpath, 'w')
-        print('output file save to ', hdf_fpath)
+        print('output to ', subject_output_dir)
 
         output_frame_index = []
         output_cam_index = []
@@ -240,7 +233,7 @@ if __name__ == '__main__':
         output_face_mat_norm = []
 
         # load landmarks
-        label_path = os.path.join('./data/annotation_train', 'subject' + str(sub_id).zfill(4) + '.csv')
+        label_path = os.path.join(args.root_dir, 'data', 'annotation_train', 'subject' + str(sub_id).zfill(4) + '.csv')
         if not os.path.exists(label_path):
             print('annotation file {} does not exit'.format(label_path))
             exit()
@@ -301,51 +294,52 @@ if __name__ == '__main__':
                 img_normalized, head_norm, gaze_norm, landmark_norm, mat_norm_face = \
                     normalizeData_face(image, face_model, landmarks, hr, ht, gaze_label_3d, camera_matrix[cam_id])
 
+                cv2.imshow('img_normalized', img_normalized)
+                cv2.waitKey(0)
+
                 # img_normalized = cv2.resize(img_normalized_ori, (224, 224), interpolation=cv2.INTER_AREA)  #if you want the 224 * 224 image size
                 # create the hdf5 file
-                if not output_frame_index:
-                    output_frame_index = output_h5_id.create_dataset("frame_index", shape=(total_data * 18, 1),
-                                                                   dtype=np.int, chunks=(1, 1))
-                    output_cam_index = output_h5_id.create_dataset("cam_index", shape=(total_data * 18, 1),
-                                                                     dtype=np.int, chunks=(1, 1))
-                    output_landmarks = output_h5_id.create_dataset("facial_landmarks", shape=(total_data * 18, 68, 2),
-                                                                   dtype=np.float, chunks=(1, 68, 2))
+                # if not output_frame_index:
+                #     output_frame_index = output_h5_id.create_dataset("frame_index", shape=(total_data * 18, 1),
+                #                                                    dtype=np.int, chunks=(1, 1))
+                #     output_cam_index = output_h5_id.create_dataset("cam_index", shape=(total_data * 18, 1),
+                #                                                      dtype=np.int, chunks=(1, 1))
+                #     output_landmarks = output_h5_id.create_dataset("facial_landmarks", shape=(total_data * 18, 68, 2),
+                #                                                    dtype=np.float, chunks=(1, 68, 2))
+                #
+                #     output_face_patch = output_h5_id.create_dataset("face_patch", shape=(total_data * 18, face_patch_size, face_patch_size, 3),
+                #                                                     compression='lzf', dtype=np.uint8,
+                #                                                     chunks=(1, face_patch_size, face_patch_size, 3))
+                #     output_face_mat_norm = output_h5_id.create_dataset("face_mat_norm", shape=(total_data * 18, 3, 3),
+                #                                                    dtype=np.float, chunks=(1, 3, 3))
+                #     output_face_gaze = output_h5_id.create_dataset("face_gaze", shape=(total_data * 18, 2),
+                #                                                    dtype=np.float, chunks=(1, 2))
+                #     output_face_head_pose = output_h5_id.create_dataset("face_head_pose", shape=(total_data * 18, 2),
+                #                                                         dtype=np.float, chunks=(1, 2))
 
-                    output_face_patch = output_h5_id.create_dataset("face_patch", shape=(total_data * 18, face_patch_size, face_patch_size, 3),
-                                                                    compression='lzf', dtype=np.uint8,
-                                                                    chunks=(1, face_patch_size, face_patch_size, 3))
-                    output_face_mat_norm = output_h5_id.create_dataset("face_mat_norm", shape=(total_data * 18, 3, 3),
-                                                                   dtype=np.float, chunks=(1, 3, 3))
-                    output_face_gaze = output_h5_id.create_dataset("face_gaze", shape=(total_data * 18, 2),
-                                                                   dtype=np.float, chunks=(1, 2))
-                    output_face_head_pose = output_h5_id.create_dataset("face_head_pose", shape=(total_data * 18, 2),
-                                                                        dtype=np.float, chunks=(1, 2))
 
+                # gaze_theta = np.arcsin((-1) * gaze_norm[1])
+                # gaze_phi = np.arctan2((-1) * gaze_norm[0], (-1) * gaze_norm[2])
+                # gaze_norm_2d = np.asarray([gaze_theta, gaze_phi])
+                #
+                # output_frame_index[save_index] = frame_index
+                # output_cam_index[save_index] = cam_id
+                #
+                # output_landmarks[save_index] = landmark_norm
+                # # output_head_rvec[save_index] = hr.reshape(3)
+                # # output_head_tvec[save_index] = ht.reshape(3)
+                # output_face_patch[save_index] = img_normalized
+                # output_face_mat_norm[save_index] = mat_norm_face
+                # output_face_gaze[save_index] = gaze_norm_2d.reshape(2)
+                #
+                # head = head_norm.reshape(1, 3)
+                # M = cv2.Rodrigues(head)[0]
+                # Zv = M[:, 2]
+                # head_2d = np.array([math.asin(Zv[1]), math.atan2(Zv[0], Zv[2])])
+                # output_face_head_pose[save_index] = head_2d.reshape(2)
+                #
+                # save_index = save_index + 1
 
-                gaze_theta = np.arcsin((-1) * gaze_norm[1])
-                gaze_phi = np.arctan2((-1) * gaze_norm[0], (-1) * gaze_norm[2])
-                gaze_norm_2d = np.asarray([gaze_theta, gaze_phi])
-
-                output_frame_index[save_index] = frame_index
-                output_cam_index[save_index] = cam_id
-
-                output_landmarks[save_index] = landmark_norm
-                # output_head_rvec[save_index] = hr.reshape(3)
-                # output_head_tvec[save_index] = ht.reshape(3)
-                output_face_patch[save_index] = img_normalized
-                output_face_mat_norm[save_index] = mat_norm_face
-                output_face_gaze[save_index] = gaze_norm_2d.reshape(2)
-
-                head = head_norm.reshape(1, 3)
-                M = cv2.Rodrigues(head)[0]
-                Zv = M[:, 2]
-                head_2d = np.array([math.asin(Zv[1]), math.atan2(Zv[0], Zv[2])])
-                output_face_head_pose[save_index] = head_2d.reshape(2)
-
-                save_index = save_index + 1
-
-        output_h5_id.close()
-        print('close the h5 file')
 
         print('finish the subject: ', sub_id)
         elapsed_time = time.time() - start_time
